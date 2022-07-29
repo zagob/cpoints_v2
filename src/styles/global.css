@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rdp-accent-color-dark: #2a9d8f;
+  --rdp-background-color-dark: #2a9d8f;
+  --rdp-accent-color: #2a9d8f;
+  --rdp-background-color: #2a9d8f;
+}
+
+body {
+  @apply bg-gradient-to-r from-blue-800 to-blue-700 text-white;
+}
+
+.content {
+  @apply h-screen flex items-center justify-center;
+}
