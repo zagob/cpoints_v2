@@ -60,7 +60,6 @@ export function Input({
             disabled:focus:border-transparent
             transition-all duration-500
             `}
-          // required
           {...register}
           {...rest}
         />

@@ -3,10 +3,10 @@ import type {
   GetServerSidePropsContext,
   NextPage,
 } from "next";
-import { GoogleLogo, Lock, User } from "phosphor-react";
-import { useContext, useState } from "react";
+import { Lock, User } from "phosphor-react";
+import { useContext } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { parseCookies } from "nookies";
@@ -17,10 +17,6 @@ import GoogleIcon from "../../public/assets/googleIcon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
-import { redirect } from "next/dist/server/api-utils";
-import { GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../services/firebase";
-import { varifyToken } from "../services/firebaseAdmin";
 
 type FormDataSubmit = {
   email: string;
@@ -35,20 +31,28 @@ const schema = yup
   .required();
 
 const Home: NextPage = () => {
-  const { onSignWithGoogle, onSignOut, loadingUser, user } =
+  const { onSignWithGoogle, loadingUser, user } =
     useContext(AuthContextProvider);
   const {
     handleSubmit,
     watch,
-    control,
+    register,
     formState: { errors },
   } = useForm<FormDataSubmit>({
     resolver: yupResolver(schema),
   });
-  console.log("u", user);
+
   function handleSubmitSignIn(data: FormDataSubmit) {
     console.log(errors);
     console.log(data);
+  }
+
+  if (loadingUser) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg">
+        <span>Carregando...</span>
+      </div>
+    );
   }
 
   return (
@@ -59,36 +63,24 @@ const Home: NextPage = () => {
           onSubmit={handleSubmit(handleSubmitSignIn)}
           className="h-full flex flex-col justify-center gap-2"
         >
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                icon={User}
-                placeholder="E-mail"
-                type="email"
-                hasFilled={!!watch().email}
-                isError={!!errors.email}
-                messageError={errors.email?.message}
-                {...field}
-              />
-            )}
+          <Input
+            icon={User}
+            placeholder="E-mail"
+            type="email"
+            hasFilled={!!watch().email}
+            isError={!!errors.email}
+            messageError={errors.email?.message}
+            register={{ ...register("email") }}
           />
 
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <Input
-                icon={Lock}
-                placeholder="Password"
-                type="password"
-                hasFilled={!!watch().password}
-                isError={!!errors.password}
-                messageError={errors.password?.message}
-                {...field}
-              />
-            )}
+          <Input
+            icon={Lock}
+            placeholder="Password"
+            type="password"
+            hasFilled={!!watch().password}
+            isError={!!errors.password}
+            messageError={errors.password?.message}
+            register={{ ...register("password") }}
           />
 
           <Button color="green" type="submit">

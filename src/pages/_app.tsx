@@ -2,15 +2,17 @@ import type { AppProps } from "next/app";
 import "../styles/global.css";
 import "../styles/day-picker.css";
 import { CalendarProvider } from "../contexts/ContextCalendarProvider";
-import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "../contexts/AuthContextProvider";
+import { ModalProvider } from "../contexts/ContextModalProvider";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      <CalendarProvider>
-        <Component {...pageProps} />
-      </CalendarProvider>
+      <ModalProvider>
+        <CalendarProvider>
+          <Component {...pageProps} />
+        </CalendarProvider>
+      </ModalProvider>
     </AuthProvider>
   );
 }

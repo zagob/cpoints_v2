@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { ImageLoader, ImageProps } from "next/image";
 import { PencilSimple, User } from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
@@ -21,29 +21,33 @@ export function ResumePerfil() {
       </div>
 
       <div className=" rounded-lg shadow-2xl py-4 w-full flex justify-around items-center">
-        {/* <div>
+        <div>
           <label className="text-gray-400">Total horas</label>
-          <span className="block text-gray-300">8</span>
+          <span className="block text-gray-300">
+            {user?.infoPoints?.totalHoursWork}
+          </span>
         </div>
         <div>
           <label className="text-gray-400">Entrada</label>
-          <span className="block text-gray-300">09:30</span>
+          <span className="block text-gray-300">{user?.infoPoints?.entry}</span>
         </div>
         <div>
           <label className="text-gray-400">Almoço</label>
-          <span className="block text-gray-300">12:30 até 14:00</span>
+          <span className="block text-gray-300">
+            {user?.infoPoints?.entryLunch} até {user?.infoPoints?.exitLunch}
+          </span>
         </div>
         <div>
           <label className="text-gray-400">Saída</label>
-          <span className="block text-gray-300">19:00</span>
-        </div> */}
+          <span className="block text-gray-300">{user?.infoPoints?.exit}</span>
+        </div>
       </div>
 
-      <div className="w-full">
+      {/* <div className="w-full">
         <span>
           Banco Horas: <strong>-09:32</strong>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 }

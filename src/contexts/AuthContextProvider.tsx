@@ -15,13 +15,23 @@ import {
 } from "../services/firebase";
 import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { createUser } from "../services/firestore";
+import { createUser, db, getUser } from "../services/firestore";
+import { doc, getDoc } from "firebase/firestore";
+
+interface InfoPointsProps {
+  entry: string;
+  entryLunch: string;
+  exitLunch: string;
+  exit: string;
+  totalHoursWork: string;
+}
 
 interface UserProps {
   id: string;
   avatar: string | null;
   name: string | null;
   emailValid: boolean;
+  infoPoints?: InfoPointsProps;
 }
 
 interface AuthContextProviderProps {
@@ -53,7 +63,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     const { displayName, emailVerified, photoURL, uid } = result.user;
-    await createUser();
+    const user = await getUser(uid);
+
+    if (user) {
+      setUser({
+        ...user,
+        avatar: photoURL,
+        emailValid: emailVerified,
+        id: uid,
+        name: displayName,
+      });
+      return;
+    }
+
+    await createUser(displayName, emailVerified, photoURL, uid);
+    router.push("/profile");
   }
 
   function onSignOut() {
@@ -65,27 +89,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   useEffect(() => {
-    const subscribe = onAuthStateChanged(auth, (user) => {
+    const subscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const { photoURL, displayName, emailVerified, uid } = user;
+        const userFirestore = await getUser(uid);
+
+        if (!userFirestore?.infoPoints) {
+          return router.push("/profile");
+        }
+
         setUser({
-          id: uid,
+          ...userFirestore,
           avatar: photoURL,
           name: displayName,
           emailValid: emailVerified,
+          id: uid,
         });
+
         router.push("/dashboard");
 
         return;
       }
-      setLoadingUser(false);
       router.push("/");
+      setLoadingUser(false);
     });
 
     return () => {
-      setLoadingUser(false);
       subscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

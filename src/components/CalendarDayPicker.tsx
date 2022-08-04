@@ -5,12 +5,15 @@ import { useContext, useState } from "react";
 import { ContextCalendarProvider } from "../contexts/ContextCalendarProvider";
 
 export function CalendarDayPicker() {
-  const { selectedDate, onSetSelectedDate } = useContext(
-    ContextCalendarProvider
-  );
+  const { selectedDate, onSetSelectedDate, onChangeMonth, dataTable } =
+    useContext(ContextCalendarProvider);
 
   const dataEmpty = (
     <span className="text-red-500 font-bold">*Selecione uma data</span>
+  );
+
+  const disabledDays = dataTable.map((item) =>
+    !item.selectedDateString ? [] : new Date(item.selectedDateString)
   );
 
   const dateSelectedFormat = (
@@ -26,18 +29,16 @@ export function CalendarDayPicker() {
     </span>
   );
   return (
-    <div>
+    <div className="flex justify-center">
       <DayPicker
         locale={ptBr}
         mode="single"
         selected={selectedDate}
-        disabled={[
-          { dayOfWeek: [0, 6] },
-          ...[new Date("2022-07-13"), new Date("2022/07/28")],
-        ]}
+        disabled={[{ dayOfWeek: [0, 6] }, ...disabledDays]}
         modifiers={{
           available: { dayOfWeek: [1, 2, 3, 4, 5] },
         }}
+        onMonthChange={(e) => onChangeMonth(e)}
         onSelect={(date) => onSetSelectedDate(date)}
         captionLayout="dropdown"
         styles={

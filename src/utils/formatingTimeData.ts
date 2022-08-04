@@ -19,24 +19,6 @@ function convertTimeString({ hours, minutes }: convertTimeStringProps) {
     .padStart(2, "0")}`;
 }
 
-function addTimeString(time1: string, time2: string) {
-  const [hour1, minutes1] = time1.split(":");
-  const [hour2, minutes2] = time2.split(":");
-
-  const sumTotalMinutes = Number(minutes1) + Number(minutes2);
-  const sumHours = Number(hour1) + Number(hour2);
-
-  const getHoursToTotalMinutes = Math.floor(sumTotalMinutes / 60);
-
-  const getHoursTotal = sumHours + getHoursToTotalMinutes;
-  const getRestMinutes = sumTotalMinutes % 60;
-
-  return convertTimeString({
-    hours: getHoursTotal,
-    minutes: getRestMinutes,
-  });
-}
-
 function operationTimeString(
   time1: string,
   time2: string,
@@ -70,8 +52,8 @@ function verifyStatusWithTotalWork(time: string) {
 
   const bonusTotalMinutes = getTotalMinutes - total;
 
-  const bonusHour = Math.floor(bonusTotalMinutes / 60);
-  const bonusMinutes = bonusTotalMinutes % 60;
+  const bonusHour = Math.floor(Math.abs(bonusTotalMinutes) / 60);
+  const bonusMinutes = Math.abs(bonusTotalMinutes) % 60;
 
   const bonusTimeString = convertTimeString({
     hours: bonusHour,
@@ -89,14 +71,28 @@ function verifyStatusWithTotalWork(time: string) {
 }
 
 export function getTimeDate(dataTime: DateTimeProps) {
-  const dataTimeEntry = addMinutes(addHours(new Date("2022/07/29"), 9), 30);
+  const [entry1Hour, entry1Minute] = dataTime.entry1.split(":");
+  const [exit1Hour, exit1Minute] = dataTime.exit1.split(":");
+  const [entry2Hour, entry2Minute] = dataTime.entry2.split(":");
+  const [exit2Hour, exit2Minute] = dataTime.exit2.split(":");
+
+  const dataTimeEntry = addMinutes(
+    addHours(new Date(dataTime.selectedDateString), Number(entry1Hour)),
+    Number(entry1Minute)
+  );
   const dataTimeEntryLunch = addMinutes(
-    addHours(new Date("2022/07/29"), 12),
-    30
+    addHours(new Date(dataTime.selectedDateString), Number(exit1Hour)),
+    Number(exit1Minute)
   );
 
-  const dataTimeExitLunch = addMinutes(addHours(new Date("2022/07/29"), 14), 0);
-  const dataTimeExit = addMinutes(addHours(new Date("2022/07/29"), 19), 0);
+  const dataTimeExitLunch = addMinutes(
+    addHours(new Date(dataTime.selectedDateString), Number(entry2Hour)),
+    Number(entry2Minute)
+  );
+  const dataTimeExit = addMinutes(
+    addHours(new Date(dataTime.selectedDateString), Number(exit2Hour)),
+    Number(exit2Minute)
+  );
 
   const timeMorning = intervalToDuration({
     start: dataTimeEntry,
@@ -128,22 +124,13 @@ export function getTimeDate(dataTime: DateTimeProps) {
     minutes: timeAfternoon.minutes,
   });
 
-  console.log("timeMorning", timeMorningString);
-  console.log("timeLunch", timeLunchString);
-  console.log("timeAfternoon", timeAfternoonString);
-
-  //   const totalWork = addTimeString(timeMorningString, timeAfternoonString);
   const totalWork = operationTimeString(
     timeMorningString,
     timeAfternoonString,
     "ADD"
   );
-  //   const totalWork = hoursMorning + hoursAfternoon;
 
-  console.log("totalWork", totalWork);
   const { status, bonusTimeString } = verifyStatusWithTotalWork(totalWork);
-  console.log("status", status);
-  console.log("bonusTimeString", bonusTimeString);
 
   const data = {
     ...dataTime,
@@ -153,13 +140,9 @@ export function getTimeDate(dataTime: DateTimeProps) {
     totalWork,
     status,
     bonusTimeString,
+    // bonusTimeString:
+    //   status === "NEGATIVE" ? `-${bonusTimeString}` : bonusTimeString,
   };
 
-  console.log("data", data);
-
-  //   const totalWork = operationTimeString(
-  //     timeMorningString,
-  //     timeAfternoonString,
-  //     "ADD"
-  //   );
+  return data;
 }
