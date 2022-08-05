@@ -15,16 +15,18 @@ export function NavMenu({ activeNavbar }: NavMenuProps) {
 
   const { onSignOut } = useContext(AuthContextProvider);
 
-  console.log("isMedium", isLarge);
-  console.log(activeNavbar);
   return (
     <motion.nav
-      //   initial={{ width: "60px", display: "flex" }}
+      initial={{ width: "60px", display: "flex" }}
       animate={
         isLarge && !activeNavbar
-          ? { x: -600, display: "flex", marginTop: "4rem" }
+          ? {
+              x: -600,
+              display: "flex",
+              marginTop: "3rem",
+            }
           : activeNavbar
-          ? { width: "100%", display: "flex", marginTop: "4rem" }
+          ? { width: "100%", display: "flex", marginTop: "3rem" }
           : { border: "1px solid red", x: 0, width: "60px" }
       }
       transition={{ duration: 0.4 }}
@@ -50,7 +52,7 @@ export function NavMenu({ activeNavbar }: NavMenuProps) {
         }
         className="w-full px-2"
       >
-        <ResumePerfil />
+        {isLarge && <ResumePerfil />}
       </motion.div>
       <SignOut
         className="border border-transparent transition-all p-1 hover:border hover:border-gray-500 hover:cursor-pointer"

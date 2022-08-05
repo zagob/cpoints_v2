@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import { ClipboardText, List, SignOut } from "phosphor-react";
+import { ClipboardText } from "phosphor-react";
 import { ResumePerfil } from "../components/ResumoPerfil";
 import { Table } from "../components/Table";
 
@@ -19,7 +19,7 @@ import { AuthContextProvider } from "../contexts/AuthContextProvider";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { addPointsHours, getPointsHours } from "../services/firestore";
 import { getTimeDate } from "../utils/formatingTimeData";
-import { Modal } from "../components/Modal";
+
 import { ModalDeletePoint } from "../components/modals/ModalDeletePoint";
 import { ContextModalProvider } from "../contexts/ContextModalProvider";
 import { ModalEditPoint } from "../components/modals/ModalEditPoint";
@@ -27,7 +27,6 @@ import { NavMenu } from "../components/NavMenu";
 import { useIsLarge } from "../utils/mediaQueryHook";
 
 import { motion } from "framer-motion";
-
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -108,20 +107,17 @@ export default function Dashboard() {
               className="w-6 h-[2px] bg-white"
             ></motion.div>
             <motion.div
-              animate={activeNavbar ? { display: "none" } : { rotate: 0 }}
+              animate={activeNavbar ? { opacity: 0 } : { rotate: 0 }}
               transition={{ duration: 0.4 }}
               className="w-6 h-[2px] bg-white"
             ></motion.div>
             <motion.div
-              animate={activeNavbar ? { rotate: -45 } : { display: "block" }}
+              animate={
+                activeNavbar ? { rotate: -45, y: -10 } : { display: "block" }
+              }
               className="w-6 h-[2px] bg-white"
             ></motion.div>
           </button>
-          {/* <List
-            className={`transition-all z-10 hover:cursor-pointer hover:opacity-75`}
-            size={32}
-            onClick={() => setActiveNavbar((oldState) => !oldState)}
-          /> */}
         </div>
         <div className="grid grid-cols-12 gap-4">
           <div className="bg-blue-600 rounded-lg shadow-2xl col-span-5 hidden lg:block">
