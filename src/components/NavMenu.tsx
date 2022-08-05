@@ -27,7 +27,7 @@ export function NavMenu({ activeNavbar }: NavMenuProps) {
             }
           : activeNavbar
           ? { width: "100%", display: "flex", marginTop: "3rem" }
-          : { border: "1px solid red", x: 0, width: "60px" }
+          : { x: 0, width: "60px" }
       }
       transition={{ duration: 0.4 }}
       className="

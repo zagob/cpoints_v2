@@ -1,10 +1,15 @@
 import { format } from "date-fns";
 
-import { ClipboardText } from "phosphor-react";
+import {
+  ClipboardText,
+  Clock,
+  DotsThreeOutlineVertical,
+  SignOut,
+} from "phosphor-react";
 import { ResumePerfil } from "../components/ResumoPerfil";
 import { Table } from "../components/Table";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CalendarDayPicker } from "../components/CalendarDayPicker";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
@@ -24,7 +29,7 @@ import { ModalDeletePoint } from "../components/modals/ModalDeletePoint";
 import { ContextModalProvider } from "../contexts/ContextModalProvider";
 import { ModalEditPoint } from "../components/modals/ModalEditPoint";
 import { NavMenu } from "../components/NavMenu";
-import { useIsLarge } from "../utils/mediaQueryHook";
+import { useIsLarge, useIsSmall } from "../utils/mediaQueryHook";
 
 import { motion } from "framer-motion";
 export interface SubmitFormProps {
@@ -45,6 +50,7 @@ const schema = yup
 
 export default function Dashboard() {
   const isLarge = useIsLarge();
+  const isSmall = useIsSmall();
   const [activeNavbar, setActiveNavbar] = useState(false);
   const { modalDeletePoint, modalEditPoint } = useContext(ContextModalProvider);
   const { selectedDate, dataTable } = useContext(ContextCalendarProvider);
@@ -83,18 +89,79 @@ export default function Dashboard() {
     reset();
   }
 
+  useEffect(() => {
+    if (!isSmall) {
+      setActiveNavbar(false);
+    }
+  }, [isSmall]);
+
   return (
-    <div className="flex">
+    <div className="flex flex-col">
       {modalEditPoint && <ModalEditPoint />}
       {modalDeletePoint && <ModalDeletePoint open={modalDeletePoint} />}
 
-      <NavMenu activeNavbar={activeNavbar} />
-      <motion.div
-        animate={!isLarge ? { marginLeft: "2.5rem" } : {}}
-        transition={{ duration: 0.4 }}
-        className="flex-1 grid gap-4 p-4 relative"
-      >
-        <div className={`flex lg:hidden`}>
+      {/* <NavMenu activeNavbar={activeNavbar} /> */}
+      <div className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10">
+        <div className="flex items-center gap-10">
+          <div className="flex items-center gap-4">
+            <Clock size={32} />
+            <h2 className="text-lg border-b">CPoints</h2>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-6 border">
+            <div className="flex items-center gap-4">
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Entrada: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.entry}
+                </span>
+              </div>
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Almoço: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.entryLunch} até{" "}
+                  {user?.infoPoints?.exitLunch}
+                </span>
+              </div>
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Saída: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.exit}
+                </span>
+              </div>
+              <hr className="border" />
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">
+                  Total Horas por dia:{" "}
+                </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.totalHoursWork}h
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="hidden sm:flex items-center gap-4">
+          <div className="flex items-center gap-2 border-r pr-4">
+            <img
+              className="rounded-full"
+              src="https://github.com/zagob.png"
+              alt="Avatar"
+              width={32}
+              height={32}
+            />
+            <h3 className="">{user?.name}</h3>
+            <DotsThreeOutlineVertical
+              size={22}
+              className="block lg:hidden transition-all hover:cursor-pointer hover:opacity-80"
+            />
+          </div>
+          <SignOut
+            size={32}
+            className="transition-all hover:cursor-pointer hover:opacity-80"
+          />
+        </div>
+        <div className={`block sm:hidden`}>
           <button
             className="grid grid-cols-1 gap-2"
             onClick={() => setActiveNavbar((oldState) => !oldState)}
@@ -119,115 +186,151 @@ export default function Dashboard() {
             ></motion.div>
           </button>
         </div>
-        <div className="grid grid-cols-12 gap-4">
-          <div className="bg-blue-600 rounded-lg shadow-2xl col-span-5 hidden lg:block">
-            <ResumePerfil />
-          </div>
-          <div
-            className="
-            bg-blue-600
-            rounded-lg 
-            shadow-2xl 
-            col-span-full
-            flex-col
-            py-4
-            md:p-0
-            items-center
-            justify-center
-            md:flex
-            md:justify-around
-            md:flex-row
-            lg:flex-row
-            lg:col-span-7  
-            "
-          >
-            <CalendarDayPicker />
-            <div className="flex justify-center">
-              <form
-                onSubmit={handleSubmit(handleSubmitForm)}
-                className="flex flex-col justify-center gap-4 w-[300px]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-full">
-                    <label
-                      className={`${
-                        !selectedDate && "opacity-40"
-                      } transition-all duration-500`}
-                      htmlFor="entry1"
-                    >
-                      Entrada 1:
-                    </label>
-                    <Input
-                      type="time"
-                      id="entry1"
-                      disabled={!selectedDate}
-                      hasFilled={!!watch("entry1")}
-                      isError={!!errors.entry1}
-                      register={{ ...register("entry1") }}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="">Saída: </label>
-                    <Input
-                      type="time"
-                      hasFilled={!!watch("exit1")}
-                      isError={!!errors.exit1}
-                      disabled={!!!watch("entry1")}
-                      register={{ ...register("exit1") }}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-full">
-                    <label htmlFor="">Entrada 2: </label>
-                    <Input
-                      type="time"
-                      hasFilled={!!watch("entry2")}
-                      isError={!!errors.entry2}
-                      disabled={!!!watch("exit1")}
-                      register={{ ...register("entry2") }}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="">Saída: </label>
-                    <Input
-                      type="time"
-                      hasFilled={!!watch("exit2")}
-                      isError={!!errors.exit2}
-                      disabled={!!!watch("entry2")}
-                      register={{ ...register("exit2") }}
-                    />
-                  </div>
-                </div>
+      </div>
 
-                <Button
-                  disabled={
-                    !!!watch("entry1") ||
-                    !!!watch("exit1") ||
-                    !!!watch("entry2") ||
-                    !!!watch("exit2") ||
-                    !selectedDate
-                  }
-                  type="submit"
-                  color="green"
-                >
-                  Cadastrar
-                </Button>
-              </form>
+      <motion.div
+        initial={{ x: 2000 }}
+        animate={activeNavbar ? { x: 100 } : { x: 2000 }}
+        transition={{ duration: 0.4 }}
+        className="absolute w-full h-[calc(100vh-60px)] mt-[60px] right-0 bg-blue-800 z-10 p-4"
+      >
+        <div className="flex flex-col h-full justify-between gap-2">
+          <div>
+            <div className="flex items-center justify-start gap-2">
+              <img
+                className="rounded-full"
+                src="https://github.com/zagob.png"
+                alt="Avatar"
+                width={32}
+                height={32}
+              />
+              <h3 className="">{user?.name}</h3>
+            </div>
+            <div className="flex flex-col items-start gap-4 mt-8">
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Entrada: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.entry}
+                </span>
+              </div>
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Almoço: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.entryLunch} até{" "}
+                  {user?.infoPoints?.exitLunch}
+                </span>
+              </div>
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">Saída: </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.exit}
+                </span>
+              </div>
+              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+                <label className="text-sm text-gray-200">
+                  Total Horas por dia:{" "}
+                </label>
+                <span className="text-sm font-bold">
+                  {user?.infoPoints?.totalHoursWork}h
+                </span>
+              </div>
             </div>
           </div>
+          <SignOut
+            size={32}
+            className="transition-all hover:cursor-pointer hover:opacity-80"
+          />
         </div>
-        <div className="bg-blue-600 rounded-lg shadow-2xl overflow-hidden">
+      </motion.div>
+
+      <div className="flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] relative">
+        <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl">
+          <CalendarDayPicker />
+          <div className="flex justify-center">
+            <form
+              onSubmit={handleSubmit(handleSubmitForm)}
+              className="flex flex-col justify-center gap-4 w-[300px]"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-full">
+                  <label
+                    className={`${
+                      !selectedDate && "opacity-40"
+                    } transition-all duration-500`}
+                    htmlFor="entry1"
+                  >
+                    Entrada 1:
+                  </label>
+                  <Input
+                    type="time"
+                    id="entry1"
+                    disabled={!selectedDate}
+                    hasFilled={!!watch("entry1")}
+                    isError={!!errors.entry1}
+                    register={{ ...register("entry1") }}
+                  />
+                </div>
+                <div className="w-full">
+                  <label htmlFor="">Saída 1: </label>
+                  <Input
+                    type="time"
+                    hasFilled={!!watch("exit1")}
+                    isError={!!errors.exit1}
+                    disabled={!!!watch("entry1")}
+                    register={{ ...register("exit1") }}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-full">
+                  <label htmlFor="">Entrada 2: </label>
+                  <Input
+                    type="time"
+                    hasFilled={!!watch("entry2")}
+                    isError={!!errors.entry2}
+                    disabled={!!!watch("exit1")}
+                    register={{ ...register("entry2") }}
+                  />
+                </div>
+                <div className="w-full">
+                  <label htmlFor="">Saída 2: </label>
+                  <Input
+                    type="time"
+                    hasFilled={!!watch("exit2")}
+                    isError={!!errors.exit2}
+                    disabled={!!!watch("entry2")}
+                    register={{ ...register("exit2") }}
+                  />
+                </div>
+              </div>
+
+              <Button
+                disabled={
+                  !!!watch("entry1") ||
+                  !!!watch("exit1") ||
+                  !!!watch("entry2") ||
+                  !!!watch("exit2") ||
+                  !selectedDate
+                }
+                type="submit"
+                color="green"
+              >
+                Cadastrar
+              </Button>
+            </form>
+          </div>
+        </div>
+        <div className="mb-2 flex-1 bg-blue-600 rounded-lg shadow-2xl">
           {dataTable.length > 0 ? (
             <Table data={dataTable} />
           ) : (
-            <div className="h-full flex flex-col items-center justify-center opacity-25">
+            <div className="flex h-full flex-col items-center justify-center opacity-25">
               <h2 className="text-2xl">Nenhum dado cadastrado</h2>
               <ClipboardText size={100} />
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
       <Toaster position="top-center" />
     </div>
   );

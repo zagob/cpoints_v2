@@ -24,11 +24,12 @@ export default function Profile() {
     formState: { errors },
   } = useForm<SubmitFormProps>();
 
-  function handleSubmitForm(data: SubmitFormProps) {
+  async function handleSubmitForm(data: SubmitFormProps) {
     if (!user) {
       return;
     }
-    addInfoPoints(data, user.id);
+
+    await addInfoPoints(data, user.id);
 
     router.push("/dashboard");
   }

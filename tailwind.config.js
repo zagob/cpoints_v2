@@ -2,9 +2,10 @@
 module.exports = {
   content: ["./src/**/*.{html,tsx}"],
   theme: {
-    // screens: {
-    //   // lg: "1040px",
-    // },
+    screens: {
+      lg: "1048px",
+      sm: "444px",
+    },
     extend: {
       colors: {
         blue: {

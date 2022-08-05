@@ -54,6 +54,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps | null>(({} as UserProps) || null);
   const [loadingUser, setLoadingUser] = useState(true);
 
+  function addDataUser() {}
+
   async function onSignWithGoogle() {
     const result = await signInWithGoogle();
     const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -80,11 +82,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     router.push("/profile");
   }
 
-  function onSignOut() {
-    signOut(auth);
-    destroyCookie(null, "token", {
-      path: "/dashboard",
-    });
+  async function onSignOut() {
+    await signOut(auth);
+    // destroyCookie(null, "token", {
+    //   path: "/dashboard",
+    // });
     router.push("/");
   }
 

@@ -15,7 +15,7 @@ export function Table({ data }: TableProps) {
     useContext(ContextModalProvider);
 
   return (
-    <div className="relative table-auto rounded-md shadow-2xl bg-blue-600 h-[390px] overflow-y-auto overflow-x-auto">
+    <div className="relative table-auto rounded-md shadow-2xl bg-blue-600 h-full overflow-y-auto overflow-x-auto">
       <table className="w-full text-sm text-left text-gray-400">
         <thead className="text-xs uppercase bg-gray-700 text-gray-400">
           <tr>
