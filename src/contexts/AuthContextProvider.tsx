@@ -1,22 +1,14 @@
 import { useRouter } from "next/router";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { setCookie, destroyCookie, parseCookies } from "nookies";
+import { createContext, ReactNode, useEffect, useState } from "react";
+import { setCookie } from "nookies";
 import {
   auth,
   onAuthStateChanged,
   signInWithGoogle,
   signOut,
 } from "../services/firebase";
-import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { GoogleAuthProvider } from "firebase/auth";
 import { createUser, db, getUser } from "../services/firestore";
-import { doc, getDoc } from "firebase/firestore";
 
 interface InfoPointsProps {
   entry: string;

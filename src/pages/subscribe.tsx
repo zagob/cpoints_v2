@@ -37,7 +37,7 @@ export default function Subscribe() {
   }
   return (
     <div className="content">
-      <div className="shadow-2xl shadow-blue-800 border-cyan-900 rounded-[1.125rem] w-[500px] h-[400px] border flex flex-col items-center p-8">
+      <div className="shadow-2xl shadow-blue-800 border-cyan-900 rounded-[1.125rem] lg:w-[500px] h-[400px] border flex flex-col items-center p-8">
         <h2 className="font-mono text-3xl">Cadastro</h2>
         <form
           onSubmit={handleSubmit(handleSubmitSignIn)}

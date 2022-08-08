@@ -57,7 +57,20 @@ const Home: NextPage = () => {
 
   return (
     <div className="content">
-      <div className="shadow-2xl shadow-blue-800 border-cyan-900 border rounded-[1.125rem] w-[500px] h-[400px] flex flex-col items-center p-8">
+      <div
+        className="
+        shadow-2xl 
+        shadow-blue-800 
+        border-cyan-900 
+        border 
+        rounded-[1.125rem] 
+        lg:w-[500px]
+        h-[400px] 
+        flex 
+        flex-col 
+        items-center 
+        p-8"
+      >
         <h2 className="font-mono text-3xl">Login</h2>
         <form
           onSubmit={handleSubmit(handleSubmitSignIn)}
@@ -125,8 +138,6 @@ export const getServerSideProps: GetServerSideProps = async (
   const cookies = parseCookies(ctx, {
     path: "/dashboard",
   });
-
-  console.log("cookiesToken", cookies);
 
   return {
     props: {},

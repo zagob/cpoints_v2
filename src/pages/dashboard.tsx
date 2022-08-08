@@ -1,12 +1,6 @@
 import { format } from "date-fns";
 
-import {
-  ClipboardText,
-  Clock,
-  DotsThreeOutlineVertical,
-  SignOut,
-} from "phosphor-react";
-import { ResumePerfil } from "../components/ResumoPerfil";
+import { ClipboardText } from "phosphor-react";
 import { Table } from "../components/Table";
 
 import { useContext, useEffect, useState } from "react";
@@ -29,9 +23,10 @@ import { ModalDeletePoint } from "../components/modals/ModalDeletePoint";
 import { ContextModalProvider } from "../contexts/ContextModalProvider";
 import { ModalEditPoint } from "../components/modals/ModalEditPoint";
 import { NavMenu } from "../components/NavMenu";
-import { useIsLarge, useIsSmall } from "../utils/mediaQueryHook";
+import { useIsSmall } from "../utils/mediaQueryHook";
 
-import { motion } from "framer-motion";
+import { NavMenuMobile } from "../components/NavMenuMobile";
+import { formatBonus } from "../utils/formatBonus";
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -49,7 +44,6 @@ const schema = yup
   .required();
 
 export default function Dashboard() {
-  const isLarge = useIsLarge();
   const isSmall = useIsSmall();
   const [activeNavbar, setActiveNavbar] = useState(false);
   const { modalDeletePoint, modalEditPoint } = useContext(ContextModalProvider);
@@ -89,6 +83,26 @@ export default function Dashboard() {
     reset();
   }
 
+  function onChangeActiveNavbar() {
+    setActiveNavbar((old) => !old);
+  }
+
+  const t = dataTable.reduce((acc, value) => {
+    const [hour, minute] = value.bonusTimeString.split(":");
+    const hourToMinutesNumber = Math.floor(Number(hour) * 60) + Number(minute);
+
+    if (value.status === "NEGATIVE") {
+      return acc - hourToMinutesNumber;
+    }
+    if (value.status === "POSITIVE") {
+      return acc + hourToMinutesNumber;
+    }
+
+    return 0;
+  }, 0);
+
+  const timeBonus = formatBonus(t);
+
   useEffect(() => {
     if (!isSmall) {
       setActiveNavbar(false);
@@ -100,151 +114,21 @@ export default function Dashboard() {
       {modalEditPoint && <ModalEditPoint />}
       {modalDeletePoint && <ModalDeletePoint open={modalDeletePoint} />}
 
-      {/* <NavMenu activeNavbar={activeNavbar} /> */}
-      <div className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10">
-        <div className="flex items-center gap-10">
-          <div className="flex items-center gap-4">
-            <Clock size={32} />
-            <h2 className="text-lg border-b">CPoints</h2>
-          </div>
+      <NavMenu
+        activeNavbar={activeNavbar}
+        onChangeActiveNavbar={onChangeActiveNavbar}
+        timeBonus={timeBonus}
+      />
 
-          <div className="hidden lg:flex items-center gap-6 border">
-            <div className="flex items-center gap-4">
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Entrada: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.entry}
-                </span>
-              </div>
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Almoço: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.entryLunch} até{" "}
-                  {user?.infoPoints?.exitLunch}
-                </span>
-              </div>
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Saída: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.exit}
-                </span>
-              </div>
-              <hr className="border" />
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">
-                  Total Horas por dia:{" "}
-                </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.totalHoursWork}h
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="hidden sm:flex items-center gap-4">
-          <div className="flex items-center gap-2 border-r pr-4">
-            <img
-              className="rounded-full"
-              src="https://github.com/zagob.png"
-              alt="Avatar"
-              width={32}
-              height={32}
-            />
-            <h3 className="">{user?.name}</h3>
-            <DotsThreeOutlineVertical
-              size={22}
-              className="block lg:hidden transition-all hover:cursor-pointer hover:opacity-80"
-            />
-          </div>
-          <SignOut
-            size={32}
-            className="transition-all hover:cursor-pointer hover:opacity-80"
-          />
-        </div>
-        <div className={`block sm:hidden`}>
-          <button
-            className="grid grid-cols-1 gap-2"
-            onClick={() => setActiveNavbar((oldState) => !oldState)}
-          >
-            <motion.div
-              animate={
-                activeNavbar ? { rotate: 45, y: 10 } : { rotate: 0, y: 0 }
-              }
-              transition={{ duration: 0.4 }}
-              className="w-6 h-[2px] bg-white"
-            ></motion.div>
-            <motion.div
-              animate={activeNavbar ? { opacity: 0 } : { rotate: 0 }}
-              transition={{ duration: 0.4 }}
-              className="w-6 h-[2px] bg-white"
-            ></motion.div>
-            <motion.div
-              animate={
-                activeNavbar ? { rotate: -45, y: -10 } : { display: "block" }
-              }
-              className="w-6 h-[2px] bg-white"
-            ></motion.div>
-          </button>
-        </div>
-      </div>
+      <NavMenuMobile activeNavbar={activeNavbar} />
 
-      <motion.div
-        initial={{ x: 2000 }}
-        animate={activeNavbar ? { x: 100 } : { x: 2000 }}
-        transition={{ duration: 0.4 }}
-        className="absolute w-full h-[calc(100vh-60px)] mt-[60px] right-0 bg-blue-800 z-10 p-4"
+      <div
+        className={`flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] overflow-x-hidden relative ${
+          activeNavbar && "opacity-40"
+        }`}
+        onClick={() => activeNavbar && setActiveNavbar(false)}
       >
-        <div className="flex flex-col h-full justify-between gap-2">
-          <div>
-            <div className="flex items-center justify-start gap-2">
-              <img
-                className="rounded-full"
-                src="https://github.com/zagob.png"
-                alt="Avatar"
-                width={32}
-                height={32}
-              />
-              <h3 className="">{user?.name}</h3>
-            </div>
-            <div className="flex flex-col items-start gap-4 mt-8">
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Entrada: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.entry}
-                </span>
-              </div>
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Almoço: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.entryLunch} até{" "}
-                  {user?.infoPoints?.exitLunch}
-                </span>
-              </div>
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">Saída: </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.exit}
-                </span>
-              </div>
-              <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
-                <label className="text-sm text-gray-200">
-                  Total Horas por dia:{" "}
-                </label>
-                <span className="text-sm font-bold">
-                  {user?.infoPoints?.totalHoursWork}h
-                </span>
-              </div>
-            </div>
-          </div>
-          <SignOut
-            size={32}
-            className="transition-all hover:cursor-pointer hover:opacity-80"
-          />
-        </div>
-      </motion.div>
-
-      <div className="flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] relative">
-        <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl">
+        <div className="flex flex-col lg:flex-row justify-center items-stretch pb-4 gap-2 lg:pb-0 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl">
           <CalendarDayPicker />
           <div className="flex justify-center">
             <form

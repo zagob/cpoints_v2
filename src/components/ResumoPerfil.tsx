@@ -1,4 +1,3 @@
-import Image, { ImageLoader, ImageProps } from "next/image";
 import { PencilSimple, User } from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";

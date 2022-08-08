@@ -1,64 +1,122 @@
-import { SignOut } from "phosphor-react";
+import { Clock, DotsThreeOutlineVertical, SignOut } from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
 
 import { motion } from "framer-motion";
-import { useIsLarge } from "../utils/mediaQueryHook";
-import { ResumePerfil } from "./ResumoPerfil";
 
 interface NavMenuProps {
   activeNavbar: boolean;
+  onChangeActiveNavbar: () => void;
+  timeBonus: {
+    bonusTime: string;
+    isNegative: string;
+  };
 }
 
-export function NavMenu({ activeNavbar }: NavMenuProps) {
-  const isLarge = useIsLarge();
-
-  const { onSignOut } = useContext(AuthContextProvider);
+export function NavMenu({
+  activeNavbar,
+  onChangeActiveNavbar,
+  timeBonus,
+}: NavMenuProps) {
+  const { user } = useContext(AuthContextProvider);
 
   return (
-    <motion.nav
-      initial={{ width: "60px", display: "flex" }}
-      animate={
-        isLarge && !activeNavbar
-          ? {
-              x: -600,
-              display: "flex",
-              marginTop: "3rem",
+    <div className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10">
+      <div className="flex items-center gap-10">
+        <div className="flex items-center gap-4">
+          <Clock size={32} />
+          <h2 className="text-lg border-b">CPoints</h2>
+        </div>
+
+        <div className="hidden lg:flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+              <label className="text-sm text-gray-200">Entrada: </label>
+              <span className="text-sm font-bold">
+                {user?.infoPoints?.entry}
+              </span>
+            </div>
+            <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+              <label className="text-sm text-gray-200">Almoço: </label>
+              <span className="text-sm font-bold">
+                {user?.infoPoints?.entryLunch} até {user?.infoPoints?.exitLunch}
+              </span>
+            </div>
+            <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+              <label className="text-sm text-gray-200">Saída: </label>
+              <span className="text-sm font-bold">
+                {user?.infoPoints?.exit}
+              </span>
+            </div>
+            <hr className="border" />
+            <div className="flex gap-2 items-center border px-2 border-gray-600 bg-blue-800">
+              <label className="text-sm text-gray-200">
+                Total Horas por dia:{" "}
+              </label>
+              <span className="text-sm font-bold">
+                {user?.infoPoints?.totalHoursWork}h
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="hidden sm:flex items-center gap-4">
+        <div className="border px-2 border-gray-500 bg-blue-800 rounded-md">
+          <span
+            className={`${
+              timeBonus.isNegative === "NEGATIVE"
+                ? "text-red-500 after:bg-red-500 "
+                : timeBonus.isNegative === "POSITIVE"
+                ? "text-green-600 after:bg-green-500"
+                : "text-gray-600 after:bg-gray-500"
+            } flex items-center gap-2 after:content[''] after:w-2 after:h-2 after:rounded-full`}
+          >
+            {timeBonus.isNegative === "NEGATIVE" && "- "}
+            {timeBonus.bonusTime}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 border-r pr-4">
+          <img
+            className="rounded-full"
+            src="https://github.com/zagob.png"
+            alt="Avatar"
+            width={32}
+            height={32}
+          />
+          <h3 className="">{user?.name}</h3>
+          <DotsThreeOutlineVertical
+            size={22}
+            className="block lg:hidden transition-all hover:cursor-pointer hover:opacity-80"
+          />
+        </div>
+        <SignOut
+          size={32}
+          className="transition-all hover:cursor-pointer hover:opacity-80"
+        />
+      </div>
+      <div className={`block sm:hidden`}>
+        <button
+          className="grid grid-cols-1 gap-2"
+          onClick={onChangeActiveNavbar}
+        >
+          <motion.div
+            animate={activeNavbar ? { rotate: 45, y: 10 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="w-6 h-[2px] bg-white"
+          ></motion.div>
+          <motion.div
+            animate={activeNavbar ? { opacity: 0 } : { rotate: 0 }}
+            transition={{ duration: 0.4 }}
+            className="w-6 h-[2px] bg-white"
+          ></motion.div>
+          <motion.div
+            animate={
+              activeNavbar ? { rotate: -45, y: -10 } : { display: "block" }
             }
-          : activeNavbar
-          ? { width: "100%", display: "flex", marginTop: "3rem" }
-          : { x: 0, width: "60px" }
-      }
-      transition={{ duration: 0.4 }}
-      className="
-        h-full
-        overflow-y-hidden
-        bg-blue-600 
-        shadow-2xl
-        z-10
-        absolute
-        flex-col 
-        items-center 
-        justify-between 
-        py-4"
-    >
-      <motion.div
-        animate={
-          isLarge && !activeNavbar
-            ? { opacity: 0 }
-            : activeNavbar
-            ? { opacity: 1 }
-            : {}
-        }
-        className="w-full px-2"
-      >
-        {isLarge && <ResumePerfil />}
-      </motion.div>
-      <SignOut
-        className="border border-transparent transition-all p-1 hover:border hover:border-gray-500 hover:cursor-pointer"
-        size={40}
-        onClick={onSignOut}
-      />
-    </motion.nav>
+            className="w-6 h-[2px] bg-white"
+          ></motion.div>
+        </button>
+      </div>
+    </div>
   );
 }

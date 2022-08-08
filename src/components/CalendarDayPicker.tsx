@@ -1,7 +1,7 @@
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import ptBr from "date-fns/locale/pt";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { ContextCalendarProvider } from "../contexts/ContextCalendarProvider";
 
 export function CalendarDayPicker() {
