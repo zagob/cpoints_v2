@@ -1,4 +1,9 @@
-import { Clock, DotsThreeOutlineVertical, SignOut } from "phosphor-react";
+import {
+  Clock,
+  DotsThreeOutlineVertical,
+  SignOut,
+  UserCircle,
+} from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
 
@@ -18,7 +23,7 @@ export function NavMenu({
   onChangeActiveNavbar,
   timeBonus,
 }: NavMenuProps) {
-  const { user } = useContext(AuthContextProvider);
+  const { user, onSignOut } = useContext(AuthContextProvider);
 
   return (
     <div className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10">
@@ -76,13 +81,7 @@ export function NavMenu({
           </span>
         </div>
         <div className="flex items-center gap-2 border-r pr-4">
-          <img
-            className="rounded-full"
-            src="https://github.com/zagob.png"
-            alt="Avatar"
-            width={32}
-            height={32}
-          />
+          <UserCircle size={32} />
           <h3 className="">{user?.name}</h3>
           <DotsThreeOutlineVertical
             size={22}
@@ -92,6 +91,7 @@ export function NavMenu({
         <SignOut
           size={32}
           className="transition-all hover:cursor-pointer hover:opacity-80"
+          onClick={onSignOut}
         />
       </div>
       <div className={`block sm:hidden`}>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SignOut } from "phosphor-react";
+import { SignOut, UserCircle } from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
 
@@ -20,13 +20,7 @@ export function NavMenuMobile({ activeNavbar }: NavMenuMobileProps) {
       <div className="flex flex-col h-full justify-between gap-2">
         <div>
           <div className="flex items-center justify-start gap-2">
-            <img
-              className="rounded-full"
-              src="https://github.com/zagob.png"
-              alt="Avatar"
-              width={32}
-              height={32}
-            />
+            <UserCircle size={32} />
             <h3 className="">{user?.name}</h3>
           </div>
           <div className="flex flex-col items-start gap-4 mt-8">
