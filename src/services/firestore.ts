@@ -19,11 +19,13 @@ const db = getFirestore(app);
 export async function createUser(
   displayName: string | null,
   emailVerified: boolean,
+  email: string | null,
   photoURL: string | null,
   uid: string
 ) {
   await setDoc(doc(db, "users", uid), {
     id: uid,
+    email,
     name: displayName,
     avatar: photoURL,
     emailVerified,

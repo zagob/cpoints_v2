@@ -11,11 +11,12 @@ export interface SubmitFormProps {
   entryLunch: string;
   exitLunch: string;
   exit: string;
-  totalHoursWork: number;
+  totalHoursWork: string;
 }
 
 export default function Profile() {
-  const { user } = useContext(AuthContextProvider);
+  const { user, onSignOut, addInfoPointsToUser } =
+    useContext(AuthContextProvider);
   const router = useRouter();
   const {
     register,
@@ -30,6 +31,7 @@ export default function Profile() {
     }
 
     await addInfoPoints(data, user.id);
+    addInfoPointsToUser(data);
 
     router.push("/dashboard");
   }
@@ -96,6 +98,9 @@ export default function Profile() {
             color="green"
           >
             Enviar
+          </Button>
+          <Button onClick={onSignOut} type="button">
+            Cancelar
           </Button>
         </form>
       </div>

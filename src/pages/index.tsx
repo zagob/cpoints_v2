@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { parseCookies } from "nookies";
+import toast, { Toaster } from "react-hot-toast";
 
 import * as yup from "yup";
 
@@ -17,6 +18,11 @@ import GoogleIcon from "../../public/assets/googleIcon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
+import {
+  createUserEmail,
+  sendEmailVerificationUser,
+  signUserEmailAndPassword,
+} from "../services/firebase";
 
 type FormDataSubmit = {
   email: string;
@@ -42,9 +48,20 @@ const Home: NextPage = () => {
     resolver: yupResolver(schema),
   });
 
-  function handleSubmitSignIn(data: FormDataSubmit) {
-    console.log(errors);
-    console.log(data);
+  async function handleSubmitSignIn(data: FormDataSubmit) {
+    const user = await signUserEmailAndPassword(data.email, data.password);
+
+    if (
+      user === "auth/user-not-found" ||
+      user === "auth/wrong-password" ||
+      user === "auth/email-already-in-use"
+    ) {
+      return toast.error("E-mail ou Senha inválidos!");
+    }
+
+    if (!user.user.emailVerified) {
+      return await sendEmailVerificationUser(user.user);
+    }
   }
 
   if (loadingUser) {
@@ -57,6 +74,7 @@ const Home: NextPage = () => {
 
   return (
     <div className="content">
+      <Toaster />
       <div
         className="
         shadow-2xl 

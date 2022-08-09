@@ -1,12 +1,16 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { FirebaseApp, FirebaseError, initializeApp } from "firebase/app";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   getAuth,
   onAuthStateChanged,
   signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
 } from "firebase/auth";
+import { FirestoreErrorCode } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -25,6 +29,38 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+
+export async function sendEmailVerificationUser(user: any) {
+  try {
+    const actionCodeSettings = {
+      url: "https://cpoints-v2.vercel.app/?email=" + user.email,
+    };
+    await sendEmailVerification(user, actionCodeSettings);
+  } catch (err) {
+    alert(err);
+  }
+}
+
+export async function signUserEmailAndPassword(
+  email: string,
+  password: string
+) {
+  try {
+    const user = await signInWithEmailAndPassword(auth, email, password);
+    return user;
+  } catch (err) {
+    return err.code;
+  }
+}
+
+export async function createUserEmail(email: string, password: string) {
+  try {
+    const user = await createUserWithEmailAndPassword(auth, email, password);
+    return user;
+  } catch (err) {
+    return err.code;
+  }
+}
 
 export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, provider);

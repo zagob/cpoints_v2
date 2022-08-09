@@ -21,8 +21,9 @@ interface InfoPointsProps {
 interface UserProps {
   id: string;
   avatar: string | null;
+  email: string | null;
   name: string | null;
-  emailValid: boolean;
+  emailVerified: boolean;
   infoPoints?: InfoPointsProps;
 }
 
@@ -30,6 +31,8 @@ interface AuthContextProviderProps {
   loadingUser: boolean;
   user: UserProps | null;
   onSignWithGoogle: () => void;
+  onCreateAccountWithEmailAndPassword: () => void;
+  addInfoPointsToUser: (infoPoints: InfoPointsProps) => void;
   onSignOut: () => void;
 }
 
@@ -46,7 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps | null>(({} as UserProps) || null);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  function addDataUser() {}
+  async function onCreateAccountWithEmailAndPassword() {}
 
   async function onSignWithGoogle() {
     const result = await signInWithGoogle();
@@ -56,21 +59,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       path: "/dashboard",
     });
 
-    const { displayName, emailVerified, photoURL, uid } = result.user;
+    const { displayName, email, emailVerified, photoURL, uid } = result.user;
     const user = await getUser(uid);
 
     if (user) {
       setUser({
         ...user,
+        email,
         avatar: photoURL,
-        emailValid: emailVerified,
+        emailVerified,
         id: uid,
         name: displayName,
       });
       return;
     }
 
-    await createUser(displayName, emailVerified, photoURL, uid);
+    await createUser(displayName, emailVerified, email, photoURL, uid);
     router.push("/profile");
   }
 
@@ -82,23 +86,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
     router.push("/");
   }
 
+  async function addInfoPointsToUser(infoPoints: InfoPointsProps) {
+    setUser((old: any) => {
+      return {
+        ...old,
+        infoPoints,
+      };
+    });
+  }
+
   useEffect(() => {
     const subscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const { photoURL, displayName, emailVerified, uid } = user;
+        const { photoURL, email, displayName, emailVerified, uid } = user;
         const userFirestore = await getUser(uid);
-
-        if (!userFirestore?.infoPoints) {
-          return router.push("/profile");
-        }
 
         setUser({
           ...userFirestore,
           avatar: photoURL,
           name: displayName,
-          emailValid: emailVerified,
+          emailVerified,
+          email,
           id: uid,
         });
+
+        if (!emailVerified) {
+          return router.push("/verifyEmail");
+        }
+
+        if (!userFirestore?.infoPoints) {
+          return router.push("/profile");
+        }
 
         router.push("/dashboard");
 
@@ -112,11 +130,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       subscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router.pathname]);
 
   return (
     <AuthContextProvider.Provider
-      value={{ onSignWithGoogle, loadingUser, onSignOut, user }}
+      value={{
+        onSignWithGoogle,
+        addInfoPointsToUser,
+        loadingUser,
+        onSignOut,
+        user,
+        onCreateAccountWithEmailAndPassword,
+      }}
     >
       {children}
     </AuthContextProvider.Provider>

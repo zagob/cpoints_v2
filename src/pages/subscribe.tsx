@@ -1,4 +1,4 @@
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 
@@ -6,6 +6,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Lock, User } from "phosphor-react";
 import Link from "next/link";
+import {
+  createUserEmail,
+  sendEmailVerificationUser,
+} from "../services/firebase";
+
+import toast, { Toaster } from "react-hot-toast";
+import { createUser } from "../services/firestore";
 
 type FormDataSubmit = {
   name: string;
@@ -25,69 +32,60 @@ export default function Subscribe() {
   const {
     handleSubmit,
     watch,
-    control,
+    register,
     formState: { errors },
   } = useForm<FormDataSubmit>({
     resolver: yupResolver(schema),
   });
 
-  function handleSubmitSignIn(data: FormDataSubmit) {
-    console.log(errors);
-    console.log(data);
+  async function handleSubmitSignIn(data: FormDataSubmit) {
+    const user = await createUserEmail(data.email, data.password);
+    if (user === "auth/email-already-in-use") {
+      return toast.error("E-mail já existente");
+    }
+    await sendEmailVerificationUser(user.user);
+
+    const { email, emailVerified, photoURL, uid } = user.user;
+
+    await createUser(data.name, emailVerified, email, photoURL, uid);
+    toast.success("Conta criada com sucesso! verifique seu email para ativar");
   }
+
   return (
     <div className="content">
+      <Toaster />
       <div className="shadow-2xl shadow-blue-800 border-cyan-900 rounded-[1.125rem] lg:w-[500px] h-[400px] border flex flex-col items-center p-8">
         <h2 className="font-mono text-3xl">Cadastro</h2>
         <form
           onSubmit={handleSubmit(handleSubmitSignIn)}
           className="h-full flex flex-col justify-center gap-2"
         >
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <Input
-                icon={User}
-                placeholder="Nome"
-                type="text"
-                hasFilled={!!watch().name}
-                isError={!!errors.name}
-                messageError={errors.name?.message}
-                {...field}
-              />
-            )}
+          <Input
+            icon={User}
+            placeholder="Name"
+            type="text"
+            hasFilled={!!watch().name}
+            isError={!!errors.name}
+            messageError={errors.name?.message}
+            register={{ ...register("name") }}
           />
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                icon={User}
-                placeholder="E-mail"
-                type="email"
-                hasFilled={!!watch().email}
-                isError={!!errors.email}
-                messageError={errors.email?.message}
-                {...field}
-              />
-            )}
+          <Input
+            icon={User}
+            placeholder="Email"
+            type="text"
+            hasFilled={!!watch().email}
+            isError={!!errors.email}
+            messageError={errors.email?.message}
+            register={{ ...register("email") }}
           />
-
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <Input
-                icon={Lock}
-                placeholder="Password"
-                type="password"
-                hasFilled={!!watch().password}
-                isError={!!errors.password}
-                messageError={errors.password?.message}
-                {...field}
-              />
-            )}
+          <Input
+            icon={Lock}
+            placeholder="Password"
+            type="password"
+            hasFilled={!!watch().password}
+            isError={!!errors.password}
+            messageError={errors.password?.message}
+            register={{ ...register("password") }}
           />
 
           <Button color="green" type="submit">

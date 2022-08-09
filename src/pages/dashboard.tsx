@@ -27,6 +27,7 @@ import { useIsSmall } from "../utils/mediaQueryHook";
 
 import { NavMenuMobile } from "../components/NavMenuMobile";
 import { formatBonus } from "../utils/formatBonus";
+import { useRouter } from "next/router";
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -45,6 +46,7 @@ const schema = yup
 
 export default function Dashboard() {
   const isSmall = useIsSmall();
+  const router = useRouter();
   const [activeNavbar, setActiveNavbar] = useState(false);
   const { modalDeletePoint, modalEditPoint } = useContext(ContextModalProvider);
   const { selectedDate, dataTable } = useContext(ContextCalendarProvider);
