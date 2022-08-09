@@ -1,5 +1,5 @@
-// Import the functions you need from the SDKs you need
-import { FirebaseApp, FirebaseError, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
+
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -10,11 +10,7 @@ import {
   signInWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
-import { FirestoreErrorCode } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -37,7 +33,7 @@ export async function sendEmailVerificationUser(user: any) {
     };
     await sendEmailVerification(user, actionCodeSettings);
   } catch (err) {
-    alert(err);
+    return err;
   }
 }
 
@@ -48,7 +44,7 @@ export async function signUserEmailAndPassword(
   try {
     const user = await signInWithEmailAndPassword(auth, email, password);
     return user;
-  } catch (err) {
+  } catch (err: any) {
     return err.code;
   }
 }
@@ -57,7 +53,7 @@ export async function createUserEmail(email: string, password: string) {
   try {
     const user = await createUserWithEmailAndPassword(auth, email, password);
     return user;
-  } catch (err) {
+  } catch (err: any) {
     return err.code;
   }
 }
