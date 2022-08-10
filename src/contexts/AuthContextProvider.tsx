@@ -130,7 +130,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       subscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.pathname]);
+  }, []);
 
   return (
     <AuthContextProvider.Provider

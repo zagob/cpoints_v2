@@ -8,7 +8,6 @@ export default function VerifyEmail() {
 
   async function handleSendEmailVerify() {
     await sendEmailVerificationUser(user);
-    console.log(user);
   }
 
   return (

@@ -1,15 +1,11 @@
-import type {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  NextPage,
-} from "next";
+import type { NextPage } from "next";
 import { Lock, User } from "phosphor-react";
 import { useContext } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
-import { parseCookies } from "nookies";
+
 import toast, { Toaster } from "react-hot-toast";
 
 import * as yup from "yup";
@@ -19,7 +15,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
 import {
-  createUserEmail,
   sendEmailVerificationUser,
   signUserEmailAndPassword,
 } from "../services/firebase";
@@ -149,15 +144,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext
-) => {
-  const cookies = parseCookies(ctx, {
-    path: "/dashboard",
-  });
-
-  return {
-    props: {},
-  };
-};
