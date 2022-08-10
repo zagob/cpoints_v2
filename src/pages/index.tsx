@@ -32,7 +32,7 @@ const schema = yup
   .required();
 
 const Home: NextPage = () => {
-  const { onSignWithGoogle, loadingUser, user } =
+  const { onSignWithGoogle, loadingUser, loadingSignIn } =
     useContext(AuthContextProvider);
   const {
     handleSubmit,
@@ -61,8 +61,9 @@ const Home: NextPage = () => {
 
   if (loadingUser) {
     return (
-      <div className="flex justify-center items-center h-screen text-lg">
-        <span>Carregando...</span>
+      <div className="flex justify-center items-center h-screen text-lg gap-2">
+        <span className="animate-spin border-2 border-t-blue-500 border-l-blue-500 rounded-full w-6 h-6" />
+        <span className="text-gray-200">Entrando...</span>
       </div>
     );
   }
@@ -114,9 +115,10 @@ const Home: NextPage = () => {
           </Button>
 
           <button
-            className="bg-white rounded-md py-1 transition-all"
+            className="bg-white rounded-md py-1 transition-all disabled:opacity-40"
             type="button"
             onClick={onSignWithGoogle}
+            disabled={loadingSignIn}
           >
             <div className="flex justify-center items-center gap-4">
               <Image
@@ -126,7 +128,18 @@ const Home: NextPage = () => {
                 alt="Logo do google"
                 className="rounded"
               />
-              <span className="font-bold text-gray-700">Entrar com google</span>
+              {loadingSignIn ? (
+                <div className="flex gap-4">
+                  <span className="animate-pulse rounded-full w-2 h-2 bg-red-500 block"></span>
+                  <span className="animate-pulse rounded-full w-2 h-2 bg-yellow-500 block"></span>
+                  <span className="animate-pulse rounded-full w-2 h-2 bg-green-500 block"></span>
+                  <span className="animate-pulse rounded-full w-2 h-2 bg-blue-500 block"></span>
+                </div>
+              ) : (
+                <span className="font-bold text-gray-700">
+                  Entrar com google
+                </span>
+              )}
             </div>
           </button>
         </form>
