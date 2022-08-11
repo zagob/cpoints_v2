@@ -177,6 +177,8 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  /* border: 1px solid red;
+  background: red; */
 }
 
 .rdp-dropdown {
@@ -205,9 +207,9 @@
 
 .rdp-dropdown:focus:not([disabled]) + .rdp-caption_label,
 .rdp-dropdown:active:not([disabled]) + .rdp-caption_label {
-  border: var(--rdp-outline);
+  /* border: var(--rdp-outline); */
   border-radius: 6px;
-  background-color: var(--rdp-background-color);
+  /* background-color: var(--rdp-background-color); */
 }
 
 .rdp-dropdown_icon {

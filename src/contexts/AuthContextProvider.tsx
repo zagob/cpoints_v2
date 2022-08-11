@@ -84,6 +84,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // router.push("/profile");
     } finally {
       setLoadingSignIn(false);
+      if (user) {
+        router.push("/dashboard");
+      }
     }
   }
 

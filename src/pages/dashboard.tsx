@@ -26,8 +26,7 @@ import { NavMenu } from "../components/NavMenu";
 import { useIsSmall } from "../utils/mediaQueryHook";
 
 import { NavMenuMobile } from "../components/NavMenuMobile";
-import { formatBonus } from "../utils/formatBonus";
-import { useRouter } from "next/router";
+import { TimeBonus } from "../components/TimeBonus";
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -46,10 +45,11 @@ const schema = yup
 
 export default function Dashboard() {
   const isSmall = useIsSmall();
-  const router = useRouter();
   const [activeNavbar, setActiveNavbar] = useState(false);
   const { modalDeletePoint, modalEditPoint } = useContext(ContextModalProvider);
-  const { selectedDate, dataTable } = useContext(ContextCalendarProvider);
+  const { selectedDate, dataTable, onResetSelectedDate } = useContext(
+    ContextCalendarProvider
+  );
   const { user } = useContext(AuthContextProvider);
   const {
     register,
@@ -83,27 +83,12 @@ export default function Dashboard() {
     const result = getTimeDate(dataTime);
     await addPointsHours(result, user?.id);
     reset();
+    onResetSelectedDate();
   }
 
   function onChangeActiveNavbar() {
     setActiveNavbar((old) => !old);
   }
-
-  const t = dataTable.reduce((acc, value) => {
-    const [hour, minute] = value.bonusTimeString.split(":");
-    const hourToMinutesNumber = Math.floor(Number(hour) * 60) + Number(minute);
-
-    if (value.status === "NEGATIVE") {
-      return acc - hourToMinutesNumber;
-    }
-    if (value.status === "POSITIVE") {
-      return acc + hourToMinutesNumber;
-    }
-
-    return 0;
-  }, 0);
-
-  const timeBonus = formatBonus(t);
 
   useEffect(() => {
     if (!isSmall) {
@@ -112,25 +97,39 @@ export default function Dashboard() {
   }, [isSmall]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4">
       {modalEditPoint && <ModalEditPoint />}
       {modalDeletePoint && <ModalDeletePoint open={modalDeletePoint} />}
 
       <NavMenu
         activeNavbar={activeNavbar}
         onChangeActiveNavbar={onChangeActiveNavbar}
-        timeBonus={timeBonus}
       />
 
       <NavMenuMobile activeNavbar={activeNavbar} />
 
       <div
-        className={`flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] overflow-x-hidden relative ${
-          activeNavbar && "opacity-40"
-        }`}
+        className="flex items-stretch gap-6 h-[calc(100vh-60px)] mx-4 pb-10"
+        // className={`flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] overflow-x-hidden relative ${
+        //   activeNavbar && "opacity-40"
+        // }`}
         onClick={() => activeNavbar && setActiveNavbar(false)}
       >
-        <div className="flex flex-col lg:flex-row justify-center items-stretch pb-4 gap-2 lg:pb-0 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl">
+        <div
+          // className="flex flex-col lg:flex-row justify-center items-stretch pb-4 gap-2 lg:pb-0 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl"
+          className="
+          flex 
+          flex-col 
+          lg:flex-col 
+          justify-center
+          items-center
+          p-4
+          bg-blue-600 
+          rounded-lg 
+          shadow-2xl
+          "
+        >
+          <TimeBonus />
           <CalendarDayPicker />
           <div className="flex justify-center">
             <form
@@ -190,23 +189,35 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <Button
-                disabled={
-                  !!!watch("entry1") ||
-                  !!!watch("exit1") ||
-                  !!!watch("entry2") ||
-                  !!!watch("exit2") ||
-                  !selectedDate
-                }
-                type="submit"
-                color="green"
-              >
-                Cadastrar
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  disabled={
+                    !!!watch("entry1") ||
+                    !!!watch("exit1") ||
+                    !!!watch("entry2") ||
+                    !!!watch("exit2") ||
+                    !selectedDate
+                  }
+                  type="submit"
+                  color="green"
+                  css="flex-1"
+                >
+                  Cadastrar
+                </Button>
+
+                <Button
+                  css="bg-purple-400 w-10"
+                  title="Mais horários de entrada e saída"
+                  type="button"
+                  disabled={!!!watch("exit2")}
+                >
+                  +
+                </Button>
+              </div>
             </form>
           </div>
         </div>
-        <div className="mb-2 flex-1 bg-blue-600 rounded-lg shadow-2xl">
+        <div className="flex-1 bg-blue-600 rounded-lg shadow-2xl overflow-x-auto">
           {dataTable.length > 0 ? (
             <Table data={dataTable} />
           ) : (

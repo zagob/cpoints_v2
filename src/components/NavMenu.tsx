@@ -12,17 +12,9 @@ import { motion } from "framer-motion";
 interface NavMenuProps {
   activeNavbar: boolean;
   onChangeActiveNavbar: () => void;
-  timeBonus: {
-    bonusTime: string;
-    isNegative: string;
-  };
 }
 
-export function NavMenu({
-  activeNavbar,
-  onChangeActiveNavbar,
-  timeBonus,
-}: NavMenuProps) {
+export function NavMenu({ activeNavbar, onChangeActiveNavbar }: NavMenuProps) {
   const { user, onSignOut } = useContext(AuthContextProvider);
 
   return (
@@ -66,20 +58,6 @@ export function NavMenu({
         </div>
       </div>
       <div className="hidden sm:flex items-center gap-4">
-        <div className="border px-2 border-gray-500 bg-blue-800 rounded-md">
-          <span
-            className={`${
-              timeBonus.isNegative === "NEGATIVE"
-                ? "text-red-500 after:bg-red-500 "
-                : timeBonus.isNegative === "POSITIVE"
-                ? "text-green-600 after:bg-green-500"
-                : "text-gray-600 after:bg-gray-500"
-            } flex items-center gap-2 after:content[''] after:w-2 after:h-2 after:rounded-full`}
-          >
-            {timeBonus.isNegative === "NEGATIVE" && "- "}
-            {timeBonus.bonusTime}
-          </span>
-        </div>
         <div className="flex items-center gap-2 border-r pr-4">
           <UserCircle size={32} />
           <h3 className="">{user?.name}</h3>

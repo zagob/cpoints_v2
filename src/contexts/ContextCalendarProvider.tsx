@@ -42,8 +42,18 @@ export interface DataTableProps {
   totalWork: string;
 }
 
+interface SaveMonthAndYearProps {
+  month: number;
+  year: number;
+}
+
 export function CalendarProvider({ children }: CalendarProvider) {
   const { user } = useContext(AuthContextProvider);
+  const [saveMonthAndYear, setSaveMonthAndYear] =
+    useState<SaveMonthAndYearProps>({
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+    } as SaveMonthAndYearProps);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
@@ -59,6 +69,12 @@ export function CalendarProvider({ children }: CalendarProvider) {
 
   function onChangeMonth(event: Date) {
     const monthEvent = event?.getMonth() + 1;
+    const yearEvent = event?.getFullYear();
+    setSaveMonthAndYear({
+      month: monthEvent,
+      year: yearEvent,
+    });
+    console.log(monthEvent, event.getFullYear());
     setSelectedDate(
       new Date(
         `${selectedDate?.getFullYear()}/${monthEvent}/${selectedDate?.getDate()}`
@@ -115,16 +131,16 @@ export function CalendarProvider({ children }: CalendarProvider) {
           })
           .filter(
             (item) =>
-              new Date(item?.selectedDateString!).getMonth() + 1 === month &&
-              new Date(item?.selectedDateString!).getFullYear() === year
+              new Date(item?.selectedDateString!).getMonth() + 1 ===
+                saveMonthAndYear.month &&
+              new Date(item?.selectedDateString!).getFullYear() ===
+                saveMonthAndYear.year
           );
 
         setDataTable(data);
       });
-
-      // return unsub;
     }
-  }, [user, month, year]);
+  }, [user, saveMonthAndYear.month, saveMonthAndYear.year]);
 
   return (
     <ContextCalendarProvider.Provider
