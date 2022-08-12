@@ -63,7 +63,7 @@ export function Table({ data }: TableProps) {
                 borderBottomWidth: 1,
                 borderBottomStyle: "solid",
               }}
-              transition={{ duration: 1, delay: 1 }}
+              transition={{ duration: 1 }}
               key={item.id}
               className="bg-gray-800 border-gray-700 hover:cursor-pointer hover:brightness-90"
             >
