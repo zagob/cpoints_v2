@@ -11,13 +11,13 @@ interface ModalEditProps {
 
 interface ContextModalProviderProps {
   modalDeletePoint: boolean;
-  modalEditPoint: boolean;
+  modalPointTime: boolean;
   itemPoint: ModalEditProps;
   idPoint: string;
   onCloseModalDeletePoint: () => void;
-  onCloseModalEditPoint: () => void;
   onOpenDeleteModalPoint: (id: string) => void;
-  onOpenEditModalPoint: (data: ModalEditProps) => void;
+  onCloseModalPointTime: () => void;
+  onOpenModalPointTime: (data: ModalEditProps) => void;
 }
 
 export const ContextModalProvider = createContext(
@@ -30,16 +30,21 @@ interface ModalProviderProps {
 
 export function ModalProvider({ children }: ModalProviderProps) {
   const [modalDeletePoint, setModalDeletePoint] = useState(false);
-  const [modalEditPoint, setModalEditPoint] = useState(false);
+  const [modalPointTime, setModalPointTime] = useState(false);
   const [idPoint, setIdPoint] = useState("");
   const [itemPoint, setItemPoint] = useState({} as ModalEditProps);
 
-  function onCloseModalDeletePoint() {
-    setModalDeletePoint(false);
+  function onCloseModalPointTime() {
+    setModalPointTime(false);
   }
 
-  function onCloseModalEditPoint() {
-    setModalEditPoint(false);
+  function onOpenModalPointTime(data: ModalEditProps) {
+    setModalPointTime(true);
+    setItemPoint(data);
+  }
+
+  function onCloseModalDeletePoint() {
+    setModalDeletePoint(false);
   }
 
   function onOpenDeleteModalPoint(id: string) {
@@ -47,22 +52,17 @@ export function ModalProvider({ children }: ModalProviderProps) {
     setIdPoint(id);
   }
 
-  function onOpenEditModalPoint(data: ModalEditProps) {
-    setModalEditPoint(true);
-    setItemPoint(data);
-  }
-
   return (
     <ContextModalProvider.Provider
       value={{
         modalDeletePoint,
-        modalEditPoint,
         itemPoint,
         idPoint,
         onCloseModalDeletePoint,
         onOpenDeleteModalPoint,
-        onCloseModalEditPoint,
-        onOpenEditModalPoint,
+        modalPointTime,
+        onCloseModalPointTime,
+        onOpenModalPointTime,
       }}
     >
       {children}

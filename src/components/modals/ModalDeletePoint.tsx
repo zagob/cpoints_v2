@@ -31,20 +31,20 @@ export function ModalDeletePoint({ open }: ModalDeletePointProps) {
       onClose={onCloseModalDeletePoint}
     >
       <div className="flex gap-2 border-red-400 w-[300px]">
-        <button
+        <Button
           type="button"
-          className="text-gray-900 bg-green-500 w-full py-2 text-lg transition-all hover:brightness-90"
+          css="text-gray-900 bg-green-500 w-full"
           onClick={handleDeletePoint}
         >
           Sim
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="text-gray-100 w-full py-2 text-lg border transition-all hover:brightness-90"
+          className="text-gray-100 w-full border rounded-md transition-all hover:bg-white hover:text-black"
           onClick={onCloseModalDeletePoint}
         >
           Não
-        </button>
+        </Button>
       </div>
     </Modal>
   );

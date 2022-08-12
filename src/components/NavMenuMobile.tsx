@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SignOut, UserCircle } from "phosphor-react";
+import { CalendarBlank, SignOut, UserCircle } from "phosphor-react";
 import { useContext } from "react";
 import { AuthContextProvider } from "../contexts/AuthContextProvider";
 
@@ -15,7 +15,7 @@ export function NavMenuMobile({ activeNavbar }: NavMenuMobileProps) {
       initial={{ x: 2000 }}
       animate={activeNavbar ? { x: 100 } : { x: 2000 }}
       transition={{ duration: 0.4 }}
-      className="absolute w-full h-[calc(100vh-60px)] mt-[60px] right-0 z-10 p-4 bg-blue-800"
+      className="absolute w-full h-[calc(100vh-60px)] mt-[60px] right-0 top-0 z-40 p-4 bg-blue-800"
     >
       <div className="flex flex-col h-full justify-between gap-2">
         <div>

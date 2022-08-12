@@ -18,7 +18,12 @@ export function NavMenu({ activeNavbar, onChangeActiveNavbar }: NavMenuProps) {
   const { user, onSignOut } = useContext(AuthContextProvider);
 
   return (
-    <div className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10">
+    <motion.div
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 2.5 }}
+      className="h-[60px] bg-blue-600 shadow-2xl flex items-center justify-between px-10"
+    >
       <div className="flex items-center gap-10">
         <div className="flex items-center gap-4">
           <Clock size={32} />
@@ -57,6 +62,7 @@ export function NavMenu({ activeNavbar, onChangeActiveNavbar }: NavMenuProps) {
           </div>
         </div>
       </div>
+
       <div className="hidden sm:flex items-center gap-4">
         <div className="flex items-center gap-2 border-r pr-4">
           <UserCircle size={32} />
@@ -72,29 +78,34 @@ export function NavMenu({ activeNavbar, onChangeActiveNavbar }: NavMenuProps) {
           onClick={onSignOut}
         />
       </div>
-      <div className={`block sm:hidden`}>
-        <button
-          className="grid grid-cols-1 gap-2"
-          onClick={onChangeActiveNavbar}
-        >
-          <motion.div
-            animate={activeNavbar ? { rotate: 45, y: 10 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-6 h-[2px] bg-white"
-          ></motion.div>
-          <motion.div
-            animate={activeNavbar ? { opacity: 0 } : { rotate: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-6 h-[2px] bg-white"
-          ></motion.div>
-          <motion.div
-            animate={
-              activeNavbar ? { rotate: -45, y: -10 } : { display: "block" }
-            }
-            className="w-6 h-[2px] bg-white"
-          ></motion.div>
-        </button>
+
+      <div className="flex sm:hidden items-center gap-4">
+        <div className={`block sm:hidden`}>
+          <button
+            className="grid grid-cols-1 gap-2"
+            onClick={onChangeActiveNavbar}
+          >
+            <motion.div
+              animate={
+                activeNavbar ? { rotate: 45, y: 10 } : { rotate: 0, y: 0 }
+              }
+              transition={{ duration: 0.4 }}
+              className="w-6 h-[2px] bg-white"
+            ></motion.div>
+            <motion.div
+              animate={activeNavbar ? { opacity: 0 } : { rotate: 0 }}
+              transition={{ duration: 0.4 }}
+              className="w-6 h-[2px] bg-white"
+            ></motion.div>
+            <motion.div
+              animate={
+                activeNavbar ? { rotate: -45, y: -10 } : { display: "block" }
+              }
+              className="w-6 h-[2px] bg-white"
+            ></motion.div>
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

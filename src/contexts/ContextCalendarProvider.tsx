@@ -82,9 +82,6 @@ export function CalendarProvider({ children }: CalendarProvider) {
     );
   }
 
-  const year = selectedDate?.getFullYear();
-  const month = selectedDate?.getMonth()! + 1;
-
   useEffect(() => {
     if (user) {
       const queryRef = query(

@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { ClipboardText } from "phosphor-react";
 import { Table } from "../components/Table";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { CalendarDayPicker } from "../components/CalendarDayPicker";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
@@ -21,12 +21,15 @@ import { getTimeDate } from "../utils/formatingTimeData";
 
 import { ModalDeletePoint } from "../components/modals/ModalDeletePoint";
 import { ContextModalProvider } from "../contexts/ContextModalProvider";
-import { ModalEditPoint } from "../components/modals/ModalEditPoint";
 import { NavMenu } from "../components/NavMenu";
-import { useIsSmall } from "../utils/mediaQueryHook";
+import { useIsMedium, useIsSmall } from "../utils/mediaQueryHook";
 
 import { NavMenuMobile } from "../components/NavMenuMobile";
 import { TimeBonus } from "../components/TimeBonus";
+
+import { motion } from "framer-motion";
+import { NavbarsContext } from "../contexts/NavbarsContext";
+import { ModalPointTime } from "../components/modals/ModalPointTime";
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -45,8 +48,14 @@ const schema = yup
 
 export default function Dashboard() {
   const isSmall = useIsSmall();
-  const [activeNavbar, setActiveNavbar] = useState(false);
-  const { modalDeletePoint, modalEditPoint } = useContext(ContextModalProvider);
+  const isMedium = useIsMedium();
+
+  const {
+    activeNavbarMenu,
+    onActiveBarMenuForFalse,
+    onActiveBarMenuInvertValueBoolean,
+  } = useContext(NavbarsContext);
+  const { modalDeletePoint, modalPointTime } = useContext(ContextModalProvider);
   const { selectedDate, dataTable, onResetSelectedDate } = useContext(
     ContextCalendarProvider
   );
@@ -87,47 +96,37 @@ export default function Dashboard() {
   }
 
   function onChangeActiveNavbar() {
-    setActiveNavbar((old) => !old);
+    onActiveBarMenuInvertValueBoolean();
   }
 
   useEffect(() => {
     if (!isSmall) {
-      setActiveNavbar(false);
+      onActiveBarMenuForFalse();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSmall]);
 
   return (
-    <div className="flex flex-col gap-4">
-      {modalEditPoint && <ModalEditPoint />}
+    <>
+      <Toaster position="top-center" />
+      {modalPointTime && <ModalPointTime />}
       {modalDeletePoint && <ModalDeletePoint open={modalDeletePoint} />}
-
       <NavMenu
-        activeNavbar={activeNavbar}
+        activeNavbar={activeNavbarMenu}
         onChangeActiveNavbar={onChangeActiveNavbar}
       />
+      <NavMenuMobile activeNavbar={activeNavbarMenu} />
 
-      <NavMenuMobile activeNavbar={activeNavbar} />
-
-      <div
-        className="flex items-stretch gap-6 h-[calc(100vh-60px)] mx-4 pb-10"
-        // className={`flex flex-col gap-2 px-4 pt-2 h-[calc(100vh-60px)] overflow-x-hidden relative ${
-        //   activeNavbar && "opacity-40"
-        // }`}
-        onClick={() => activeNavbar && setActiveNavbar(false)}
+      <motion.div
+        animate={activeNavbarMenu ? { opacity: 0.1 } : { opacity: 100 }}
+        transition={{ duration: 0.4 }}
+        className={`h-full flex flex-col px-4 py-4 gap-4 md:flex-row md:h-[calc(100vh-60px)]`}
       >
-        <div
-          // className="flex flex-col lg:flex-row justify-center items-stretch pb-4 gap-2 lg:pb-0 lg:gap-20 bg-blue-600 rounded-lg shadow-2xl"
-          className="
-          flex 
-          flex-col 
-          lg:flex-col 
-          justify-center
-          items-center
-          p-4
-          bg-blue-600 
-          rounded-lg 
-          shadow-2xl
-          "
+        <motion.div
+          initial={{ x: -1000 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 1.5 }}
+          className="flex flex-col items-center py-6 bg-blue-600 rounded-lg shadow-2xl"
         >
           <TimeBonus />
           <CalendarDayPicker />
@@ -216,8 +215,17 @@ export default function Dashboard() {
               </div>
             </form>
           </div>
-        </div>
-        <div className="flex-1 bg-blue-600 rounded-lg shadow-2xl overflow-x-auto">
+        </motion.div>
+
+        <motion.div
+          initial={{ x: 2000 }}
+          animate={{ x: 0 }}
+          transition={{
+            duration: 1.5,
+            delay: 0.3,
+          }}
+          className="md:flex-1 h-[400px] md:h-full bg-blue-600 rounded-lg shadow-2xl"
+        >
           {dataTable.length > 0 ? (
             <Table data={dataTable} />
           ) : (
@@ -226,10 +234,9 @@ export default function Dashboard() {
               <ClipboardText size={100} />
             </div>
           )}
-        </div>
-      </div>
-      <Toaster position="top-center" />
-    </div>
+        </motion.div>
+      </motion.div>
+    </>
   );
 }
 
