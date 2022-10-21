@@ -30,6 +30,7 @@ import { TimeBonus } from "../components/TimeBonus";
 import { motion } from "framer-motion";
 import { NavbarsContext } from "../contexts/NavbarsContext";
 import { ModalPointTime } from "../components/modals/ModalPointTime";
+import { Chart } from "../components/Chart";
 export interface SubmitFormProps {
   entry1: string;
   exit1: string;
@@ -224,16 +225,21 @@ export default function Dashboard() {
             duration: 1.5,
             delay: 0.3,
           }}
-          className="md:flex-1 h-[400px] md:h-full bg-blue-600 rounded-lg shadow-2xl"
+          className="w-full flex flex-col gap-4"
         >
-          {dataTable.length > 0 ? (
-            <Table data={dataTable} />
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center opacity-25">
-              <h2 className="text-2xl">Nenhum dado cadastrado</h2>
-              <ClipboardText size={100} />
-            </div>
-          )}
+          <motion.div className="md:flex-1 h-[400px] bg-blue-600 rounded-lg shadow-2xl">
+            {dataTable.length > 0 ? (
+              <Table data={dataTable} />
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center opacity-25">
+                <h2 className="text-2xl">Nenhum dado cadastrado</h2>
+                <ClipboardText size={100} />
+              </div>
+            )}
+          </motion.div>
+          <motion.div className="flex-1 bg-blue-600 rounded-lg shadow-2xl">
+            <Chart />
+          </motion.div>
         </motion.div>
       </motion.div>
     </>

@@ -56,14 +56,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function onSignWithGoogle() {
     try {
       setLoadingSignIn(true);
-      console.log("try");
+
       const result = await signInWithGoogle();
-      console.log(result);
-      // const credential = GoogleAuthProvider.credentialFromResult(result);
-      // const token = credential?.idToken;
-      // setCookie(null, "token", JSON.stringify(token), {
-      //   path: "/dashboard",
-      // });
 
       const { displayName, email, emailVerified, photoURL, uid } = result.user;
       const user = await getUser(uid);

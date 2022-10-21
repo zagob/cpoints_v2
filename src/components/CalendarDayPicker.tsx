@@ -19,12 +19,14 @@ export function CalendarDayPicker() {
   const dateSelectedFormat = (
     <span className="text-green-500 text-sm">
       Data Selecionada:{" "}
-      {selectedDate && (
+      {selectedDate ? (
         <>
           {format(new Date(selectedDate), "d 'de' MMMM 'de' yyyy", {
             locale: ptBr,
           })}
         </>
+      ) : (
+        ""
       )}
     </span>
   );
@@ -38,6 +40,7 @@ export function CalendarDayPicker() {
         modifiers={{
           available: { dayOfWeek: [1, 2, 3, 4, 5] },
         }}
+        disableNavigation={!selectedDate}
         onMonthChange={(e) => onChangeMonth(e)}
         onSelect={(date) => onSetSelectedDate(date)}
         captionLayout="dropdown"

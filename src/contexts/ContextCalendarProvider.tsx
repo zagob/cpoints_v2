@@ -16,6 +16,7 @@ interface ContextCalendarProvider {
   onChangeMonth: (event: Date) => void;
   onResetSelectedDate: () => void;
   dataTable: DataTableProps[];
+  totalDataBonusMinutes: Number[];
 }
 
 export const ContextCalendarProvider = createContext(
@@ -58,6 +59,9 @@ export function CalendarProvider({ children }: CalendarProvider) {
     new Date()
   );
   const [dataTable, setDataTable] = useState<DataTableProps[]>([]);
+  const [totalDataBonusMinutes, setTotalDataBonusMinutes] = useState<Number[]>(
+    []
+  );
 
   function onResetSelectedDate() {
     setSelectedDate(undefined);
@@ -74,7 +78,6 @@ export function CalendarProvider({ children }: CalendarProvider) {
       month: monthEvent,
       year: yearEvent,
     });
-    console.log(monthEvent, event.getFullYear());
     setSelectedDate(
       new Date(
         `${selectedDate?.getFullYear()}/${monthEvent}/${selectedDate?.getDate()}`
@@ -90,6 +93,74 @@ export function CalendarProvider({ children }: CalendarProvider) {
       );
 
       onSnapshot(queryRef, (querySnapshot) => {
+        const allData = querySnapshot.docs.map((doc) => {
+          const {
+            id,
+            bonusTimeString,
+            timeMorningString,
+            timeLunchString,
+            selectedDateString,
+            status,
+            created_at,
+            entry2,
+            exit2,
+            entry1,
+            timeAfternoonString,
+            exit1,
+            totalWork,
+          } = doc.data();
+
+          const data = {
+            id,
+            bonusTimeString,
+            timeMorningString,
+            timeLunchString,
+            selectedDateString: new Date(selectedDateString),
+            status,
+            entry2,
+            exit2,
+            entry1,
+            timeAfternoonString,
+            exit1,
+            totalWork,
+            created_at: dateFormat(created_at),
+          };
+
+          return data;
+        });
+
+        const filterAllDataYear = allData.filter(
+          (item) =>
+            new Date(item.selectedDateString).getFullYear() ===
+            selectedDate?.getFullYear()
+        );
+
+        let arr = [];
+        for (let i = 1; i <= 12; i++) {
+          const filterMonth = filterAllDataYear.filter(
+            (item) => new Date(item.selectedDateString).getMonth() + 1 === i
+          );
+
+          const reduceFilt = filterMonth.reduce((acc, value) => {
+            const [hour, minute] = value.bonusTimeString.split(":");
+            const hourToMinutesNumber =
+              Math.floor(Number(hour) * 60) + Number(minute);
+
+            if (value.status === "NEGATIVE") {
+              return acc - hourToMinutesNumber;
+            }
+            if (value.status === "POSITIVE") {
+              return acc + hourToMinutesNumber;
+            }
+
+            return 0;
+          }, 0);
+
+          arr.push(reduceFilt);
+        }
+
+        setTotalDataBonusMinutes(arr);
+
         const data = querySnapshot.docs
           .map((doc) => {
             const {
@@ -137,7 +208,7 @@ export function CalendarProvider({ children }: CalendarProvider) {
         setDataTable(data);
       });
     }
-  }, [user, saveMonthAndYear.month, saveMonthAndYear.year]);
+  }, [user, saveMonthAndYear.month, saveMonthAndYear.year, selectedDate]);
 
   return (
     <ContextCalendarProvider.Provider
@@ -147,6 +218,7 @@ export function CalendarProvider({ children }: CalendarProvider) {
         onChangeMonth,
         dataTable,
         onResetSelectedDate,
+        totalDataBonusMinutes,
       }}
     >
       {children}
