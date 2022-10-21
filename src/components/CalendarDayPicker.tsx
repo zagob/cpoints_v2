@@ -52,7 +52,7 @@ export function CalendarDayPicker() {
         fromYear={2015}
         toYear={2025}
         modifiersStyles={{
-          disabled: { fontSize: "75%" },
+          disabled: { fontSize: "75%", cursor: "not-allowed", opacity: 0.4 },
         }}
         footer={selectedDate ? dateSelectedFormat : dataEmpty}
       />
